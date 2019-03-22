@@ -13,7 +13,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="DataTransfer\" />
     <Folder Include="PacketCompiler\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NetworkEngine\NetworkEngine.csproj" />
   </ItemGroup>
 
 </Project>
