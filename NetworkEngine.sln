@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28307.489
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkEngine", "NetworkEngine\NetworkEngine.csproj", "{F94430F0-6D8F-414D-AF35-D5F79FE47AB5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkEngine.Test", "NetworkEngine.Test\NetworkEngine.Test.csproj", "{D5DE77A1-668E-410E-A2BC-E5FB7F6D262F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{F94430F0-6D8F-414D-AF35-D5F79FE47AB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F94430F0-6D8F-414D-AF35-D5F79FE47AB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F94430F0-6D8F-414D-AF35-D5F79FE47AB5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5DE77A1-668E-410E-A2BC-E5FB7F6D262F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5DE77A1-668E-410E-A2BC-E5FB7F6D262F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5DE77A1-668E-410E-A2BC-E5FB7F6D262F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5DE77A1-668E-410E-A2BC-E5FB7F6D262F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
