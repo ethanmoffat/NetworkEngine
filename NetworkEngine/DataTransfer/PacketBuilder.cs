@@ -1,4 +1,4 @@
-﻿// Original Work Copyright (c) Ethan Moffat 2014-2016
+﻿// Original Work Copyright (c) Ethan Moffat 2014-2019
 // This file is subject to the GPL v2 License
 // For additional details, see the LICENSE file
 
@@ -13,44 +13,20 @@ namespace NetworkEngine.DataTransfer
         private const byte BREAK_STR_MAXVAL = 121;
 
         private readonly IReadOnlyList<byte> _data;
-        private readonly INumberEncoder _encoderService;
+        private readonly INumberEncoder _numberEncoder;
 
         public int Length => _data.Count;
 
-        public PacketFamily Family => (PacketFamily)_data[1];
-
-        public PacketAction Action => (PacketAction) _data[0];
-
         public PacketBuilder()
-        {
-            _data = new List<byte>();
-            _encoderService = new NumberEncoderService();
-        }
+            : this(new NumberEncoder()) { }
 
-        public PacketBuilder(PacketFamily family, PacketAction action)
-        {
-            _data = new List<byte> { (byte) action, (byte) family };
-            _encoderService = new NumberEncoderService();
-        }
+        public PacketBuilder(INumberEncoder numberEncoder)
+            : this(new List<byte>(), numberEncoder) { }
 
-        private PacketBuilder(IReadOnlyList<byte> data)
+        private PacketBuilder(IReadOnlyList<byte> data, INumberEncoder numberEncoder)
         {
             _data = data;
-            _encoderService = new NumberEncoderService();
-        }
-
-        public IPacketBuilder WithFamily(PacketFamily family)
-        {
-            var newData = new List<byte>(_data);
-            newData[1] = (byte)family;
-            return new PacketBuilder(newData);
-        }
-
-        public IPacketBuilder WithAction(PacketAction action)
-        {
-            var newData = new List<byte>(_data);
-            newData[0] = (byte)action;
-            return new PacketBuilder(newData);
+            _numberEncoder = numberEncoder;
         }
 
         public IPacketBuilder AddBreak()
@@ -65,22 +41,22 @@ namespace NetworkEngine.DataTransfer
 
         public IPacketBuilder AddChar(byte b)
         {
-            return AddBytes(_encoderService.EncodeNumber(b, 1));
+            return AddBytes(_numberEncoder.EncodeNumber(b, 1));
         }
 
         public IPacketBuilder AddShort(short s)
         {
-            return AddBytes(_encoderService.EncodeNumber(s, 2));
+            return AddBytes(_numberEncoder.EncodeNumber(s, 2));
         }
 
         public IPacketBuilder AddThree(int t)
         {
-            return AddBytes(_encoderService.EncodeNumber(t, 3));
+            return AddBytes(_numberEncoder.EncodeNumber(t, 3));
         }
 
         public IPacketBuilder AddInt(int i)
         {
-            return AddBytes(_encoderService.EncodeNumber(i, 4));
+            return AddBytes(_numberEncoder.EncodeNumber(i, 4));
         }
 
         public IPacketBuilder AddString(string s)
@@ -100,7 +76,7 @@ namespace NetworkEngine.DataTransfer
         {
             var list = new List<byte>(_data);
             list.AddRange(bytes);
-            return new PacketBuilder(list);
+            return new PacketBuilder(list, _numberEncoder);
         }
 
         public IPacket Build()

@@ -1,4 +1,4 @@
-﻿// Original Work Copyright (c) Ethan Moffat 2014-2016
+﻿// Original Work Copyright (c) Ethan Moffat 2014-2019
 // This file is subject to the GPL v2 License
 // For additional details, see the LICENSE file
 
@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace NetworkEngine.DataTransfer
 {
-    public class NumberEncoderService : INumberEncoder
+    public class NumberEncoder : INumberEncoder
     {
         private const int ONE_BYTE_MAX = 253;
         private const int TWO_BYTE_MAX = 64009;

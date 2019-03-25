@@ -1,4 +1,4 @@
-﻿// Original Work Copyright (c) Ethan Moffat 2014-2016
+﻿// Original Work Copyright (c) Ethan Moffat 2014-2019
 // This file is subject to the GPL v2 License
 // For additional details, see the LICENSE file
 
@@ -9,14 +9,6 @@ namespace NetworkEngine.DataTransfer
     public interface IPacketBuilder
     {
         int Length { get; }
-
-        PacketFamily Family { get; }
-
-        PacketAction Action { get; }
-
-        IPacketBuilder WithFamily(PacketFamily family);
-
-        IPacketBuilder WithAction(PacketAction action);
 
         IPacketBuilder AddBreak();
 

@@ -1,4 +1,4 @@
-﻿// Original Work Copyright (c) Ethan Moffat 2014-2016
+﻿// Original Work Copyright (c) Ethan Moffat 2014-2019
 // This file is subject to the GPL v2 License
 // For additional details, see the LICENSE file
 
@@ -12,30 +12,28 @@ namespace NetworkEngine.DataTransfer
 {
     public class Packet : IPacket
     {
-        private readonly INumberEncoder _encoderService;
+        private readonly INumberEncoder _numberEncoder;
 
         public int Length => RawData.Count;
 
         public int ReadPosition { get; private set; }
-
-        public PacketFamily Family { get; }
-
-        public PacketAction Action { get; }
 
         public IReadOnlyList<byte> RawData { get; }
 
         public Packet(IList<byte> data)
             : this(data.ToArray()) { }
 
+        public Packet(IList<byte> data, INumberEncoder numberEncoder)
+            : this(data.ToArray(), numberEncoder) { }
+
         public Packet(byte[] data)
+            : this(data, new NumberEncoder()) { }
+
+        public Packet(byte[] data, INumberEncoder numberEncoder)
         {
-            //note: start reading at position 2, skip family/action
-            //can call seek to read over them
-            ReadPosition = 2;
-            Family = (PacketFamily)data[1];
-            Action = (PacketAction)data[0];
+            ReadPosition = 0;
             RawData = new List<byte>(data);
-            _encoderService = new NumberEncoderService();
+            _numberEncoder = numberEncoder;
         }
 
         public void Seek(int position, SeekOrigin origin)
@@ -64,7 +62,7 @@ namespace NetworkEngine.DataTransfer
         public byte PeekChar()
         {
             ThrowIfOutOfBounds(0);
-            return (byte) _encoderService.DecodeNumber(RawData[ReadPosition]);
+            return (byte) _numberEncoder.DecodeNumber(RawData[ReadPosition]);
         }
 
         public short PeekShort()
@@ -72,7 +70,7 @@ namespace NetworkEngine.DataTransfer
             ThrowIfOutOfBounds(1);
 
             var bytes = new[] {RawData[ReadPosition], RawData[ReadPosition + 1]};
-            return (short) _encoderService.DecodeNumber(bytes);
+            return (short) _numberEncoder.DecodeNumber(bytes);
         }
 
         public int PeekThree()
@@ -85,7 +83,7 @@ namespace NetworkEngine.DataTransfer
                 RawData[ReadPosition + 1],
                 RawData[ReadPosition + 2]
             };
-            return _encoderService.DecodeNumber(bytes);
+            return _numberEncoder.DecodeNumber(bytes);
         }
 
         public int PeekInt()
@@ -99,7 +97,7 @@ namespace NetworkEngine.DataTransfer
                 RawData[ReadPosition + 2],
                 RawData[ReadPosition + 3]
             };
-            return _encoderService.DecodeNumber(bytes);
+            return _numberEncoder.DecodeNumber(bytes);
         }
 
         public string PeekString(int length)
