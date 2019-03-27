@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<packet name="AllStar">
+  <byte>Some</byte>
+  <short>Body</short>
+  <three>Once</three>
+  <int>Told</int>
+  <string length="2">Me</string>
+  <structure name="struct">
+    <byte>The</byte>
+    <byte>World</byte>
+    <byte>Is</byte>
+    <byte>Gonna</byte>
+    <int>Roll</int>
+    <three>Me</three>
+  </structure>
+  <endString>IAintTheSharpestToolInTheShed</endString>
+</packet>

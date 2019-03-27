@@ -7,6 +7,24 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="PacketCompiler\Samples\base.xml" />
+    <None Remove="PacketCompiler\Samples\basic.xml" />
+    <None Remove="PacketCompiler\Samples\comprehensive.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="PacketCompiler\Samples\base.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PacketCompiler\Samples\basic.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PacketCompiler\Samples\comprehensive.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="nunit" Version="3.10.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
@@ -14,7 +32,6 @@
 
   <ItemGroup>
     <Folder Include="DataTransfer\" />
-    <Folder Include="PacketCompiler\" />
   </ItemGroup>
 
   <ItemGroup>

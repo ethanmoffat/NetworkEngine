@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<packet name="comprehensive" base="basePacket">
+  <!-- Basic data types -->
+  <byte>OneByte</byte>
+  <char>CharByte</char>
+  <short>TwoBytes</short>
+  <three>ThreeBytes</three>
+  <int>BasicInt</int>
+
+  <!-- Basic data type arrays -->
+  <byte length="4">FourBytes</byte>
+  <char length="2">TwoChars</char>
+  <short length="3">ThreeShorts</short>
+  <three length="2">TwoThrees</three>
+  <int length="2">TwoInts</int>
+
+  <!-- Strings -->
+  <string length="8">EightCharStr</string>
+
+  <!-- Control flow -->
+  <skip length="2" />
+
+  <condition>
+    <byte>ConditionTest</byte>
+    <case value="1">
+      <short>Condition1</short>
+    </case>
+    <case value="2">
+      <int>Condition2</int>
+    </case>
+    <case value="3">
+      <char>Condition3</char>
+    </case>
+    <case value="4">
+      <condition>
+        <byte>NestedCondition</byte>
+        <case value="1">
+          <byte>NestedCondition1</byte>
+        </case>
+        <case value="2">
+          <byte>NestedCondition2</byte>
+        </case>
+      </condition>
+    </case>
+  </condition>
+
+  <!-- Structures -->
+  <structure name="SomeStruct">
+    <short>StructShort</short>
+    <string length="5">StructString</string>
+  </structure>
+
+  <!-- Brother, my loops -->
+  <group countType="char" breakOn="255" breakType="byte" peek="false">
+    <structure name="GroupStruct_Count">
+      <short>ElemId</short>
+      <byte>ElemProperty</byte>
+    </structure>
+
+    <postloop>
+      <byte>PostLoopByte</byte>
+    </postloop>
+  </group>
+
+  <group breakOn="255" breakType="byte" peek="true">
+    <structure name="GroupStruct_While">
+      <short>ElemId</short>
+      <int>ElemProperty</int>
+    </structure>
+
+    <postloop>
+      <byte>PostLoopByte</byte>
+    </postloop>
+  </group>
+
+  <group countType="char" breakOn="255" breakType="byte" peek="false">
+    <preloop>
+      <byte>GarbagePre</byte>
+    </preloop>
+
+    <structure name="GroupStruct_BreakCount">
+      <short>ElemId</short>
+      <string length="5">SomeString</string>
+    </structure>
+
+    <postloop>
+      <byte>GarbagePost</byte>
+    </postloop>
+  </group>
+
+  <group>
+    <structure name="GroupStruct_Terminating">
+      <byte>ElemByte</byte>
+      <short>ElemShort</short>
+    </structure>
+  </group>
+
+</packet>

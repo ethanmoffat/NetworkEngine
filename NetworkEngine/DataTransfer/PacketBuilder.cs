@@ -1,6 +1,4 @@
 ﻿// Original Work Copyright (c) Ethan Moffat 2014-2019
-// This file is subject to the GPL v2 License
-// For additional details, see the LICENSE file
 
 using System.Collections.Generic;
 using System.Linq;
@@ -15,8 +13,6 @@ namespace NetworkEngine.DataTransfer
         private readonly IReadOnlyList<byte> _data;
         private readonly INumberEncoder _numberEncoder;
 
-        public int Length => _data.Count;
-
         public PacketBuilder()
             : this(new NumberEncoder()) { }
 
@@ -28,6 +24,8 @@ namespace NetworkEngine.DataTransfer
             _data = data;
             _numberEncoder = numberEncoder;
         }
+
+        public int Length => _data.Count;
 
         public IPacketBuilder AddBreak()
         {
