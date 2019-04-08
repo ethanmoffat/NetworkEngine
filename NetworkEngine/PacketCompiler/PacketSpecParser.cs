@@ -69,7 +69,7 @@ namespace NetworkEngine.PacketCompiler
         {
             var result = ValidationResult.Ok;
 
-            if (!string.Equals(specXml.DocumentElement?.Name, PacketElement))
+            if (!string.Equals(specXml.DocumentElement?.Name, PacketElement, StringComparison.OrdinalIgnoreCase))
             {
                 result = ValidationResult.InvalidPacketNode;
             }
