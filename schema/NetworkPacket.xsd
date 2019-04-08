@@ -3,6 +3,7 @@
   <xs:element name="packet">
     <xs:complexType>
       <xs:group ref="allTypes"/>
+      <xs:attribute ref="name"/>
     </xs:complexType>
   </xs:element>
 

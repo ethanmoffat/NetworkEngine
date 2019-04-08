@@ -3,9 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.489
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkEngine", "NetworkEngine\NetworkEngine.csproj", "{F94430F0-6D8F-414D-AF35-D5F79FE47AB5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetworkEngine", "NetworkEngine\NetworkEngine.csproj", "{F94430F0-6D8F-414D-AF35-D5F79FE47AB5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkEngine.Test", "NetworkEngine.Test\NetworkEngine.Test.csproj", "{D5DE77A1-668E-410E-A2BC-E5FB7F6D262F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetworkEngine.Test", "NetworkEngine.Test\NetworkEngine.Test.csproj", "{D5DE77A1-668E-410E-A2BC-E5FB7F6D262F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{861DEB25-01D4-4362-B33B-B3F14B40B4A3}"
+	ProjectSection(SolutionItems) = preProject
+		schema\NetworkPacket.xsd = schema\NetworkPacket.xsd
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
