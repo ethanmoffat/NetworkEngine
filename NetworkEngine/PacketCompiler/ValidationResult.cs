@@ -4,6 +4,7 @@ namespace NetworkEngine.PacketCompiler
 {
     public enum ValidationResult
     {
-        Ok
+        Ok,
+        InvalidPacketNode
     }
 }

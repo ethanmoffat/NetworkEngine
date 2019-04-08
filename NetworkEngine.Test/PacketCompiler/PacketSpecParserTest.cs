@@ -46,6 +46,18 @@ namespace NetworkEngine.Test.PacketCompiler
             }
         }
 
+        [Test]
+        public void GivenInvalidRootElement_WhenParse_ThrowsInvalidPacketSpecException()
+        {
+            var doc = new XmlDocument();
+            doc.LoadXml(@"<?xml version=""1.0"" encoding=""utf-8""?>
+<NotPacket />");
+
+            var parser = new PacketSpecParser(doc);
+            Assert.That(() => parser.Parse(), Throws.InstanceOf<InvalidPacketSpecException>()
+                                                        .With.Property(nameof(InvalidPacketSpecException.Result)).EqualTo(ValidationResult.InvalidPacketNode));
+        }
+
         private static PacketDataType GetEnum(string name) => Enum.Parse<PacketDataType>(char.ToUpper(name[0]) + name.Substring(1));
     }
 }

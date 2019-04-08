@@ -7,6 +7,7 @@ namespace NetworkEngine.PacketCompiler
 {
     public class PacketSpecParser
     {
+        private const string PacketElement = "Packet";
         private const string NameAttribute = "name";
         private const string LengthAttribute = "length";
 
@@ -66,7 +67,14 @@ namespace NetworkEngine.PacketCompiler
 
         private static ValidationState ValidatePacketStructure(XmlDocument specXml)
         {
-            return new ValidationState(ValidationResult.Ok);
+            var result = ValidationResult.Ok;
+
+            if (!string.Equals(specXml.DocumentElement?.Name, PacketElement))
+            {
+                result = ValidationResult.InvalidPacketNode;
+            }
+
+            return new ValidationState(result);
         }
 
         private static string GetPacketName(XmlDocument specXml)
