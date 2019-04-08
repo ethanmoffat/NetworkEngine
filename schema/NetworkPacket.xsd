@@ -1,0 +1,180 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="packet">
+    <xs:complexType>
+      <xs:group ref="allTypes"/>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- Type groupings -->
+  <xs:group name="simpleTypes">
+    <xs:sequence>
+      <xs:choice maxOccurs="unbounded">
+        <xs:element ref="byte"/>
+        <xs:element ref="char"/>
+        <xs:element ref="short"/>
+        <xs:element ref="three"/>
+        <xs:element ref="int"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="typesWithoutGroup">
+    <xs:sequence>
+      <xs:choice maxOccurs="unbounded">
+        <xs:element ref="byte"/>
+        <xs:element ref="char"/>
+        <xs:element ref="short"/>
+        <xs:element ref="three"/>
+        <xs:element ref="int"/>
+        <xs:element ref="skip"/>
+        <xs:element ref="string"/>
+        <xs:element ref="structure"/>
+        <xs:element ref="condition"/>
+      </xs:choice>
+      <xs:element ref="endString" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="allTypes">
+    <xs:sequence>
+      <xs:choice maxOccurs="unbounded">
+        <xs:element ref="byte"/>
+        <xs:element ref="char"/>
+        <xs:element ref="short"/>
+        <xs:element ref="three"/>
+        <xs:element ref="int"/>
+        <xs:element ref="skip"/>
+        <xs:element ref="string"/>
+        <xs:element ref="structure"/>
+        <xs:element ref="condition"/>
+        <xs:element ref="group"/>
+      </xs:choice>
+      <xs:element ref="endString" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:group>
+
+  <!-- Basic data types -->
+  <xs:element name="byte">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:NCName">
+          <xs:attribute ref="length" use="optional"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="short">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:NCName">
+          <xs:attribute ref="length" use="optional"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="three">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:NCName">
+          <xs:attribute ref="length" use="optional"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="int">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:NCName">
+          <xs:attribute ref="length" use="optional"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="char">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:NCName">
+          <xs:attribute ref="length" use="optional"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="skip">
+    <xs:complexType>
+      <xs:attribute ref="length" use="optional"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="string">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:NCName">
+          <xs:attribute ref="length" use="optional"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="endString" type="xs:NCName"/>
+
+  <!-- Complex data types -->
+  <xs:element name="structure">
+    <xs:complexType>
+      <xs:group ref="allTypes"/>
+      <xs:attribute ref="name" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="case">
+    <xs:complexType>
+      <xs:group ref="allTypes"/>
+      <xs:attribute ref="value" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="preLoop">
+    <xs:complexType>
+      <xs:group ref="typesWithoutGroup"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="postLoop">
+    <xs:complexType>
+      <xs:group ref="typesWithoutGroup"/>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- Control flow -->
+  <xs:element name="condition">
+    <xs:complexType>
+      <xs:sequence minOccurs="1">
+        <xs:group ref="simpleTypes"/>
+        <xs:element ref="case" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="conditionAttributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="group">
+    <xs:complexType>
+      <xs:sequence maxOccurs="1">
+        <xs:element ref="preLoop"/>
+        <xs:element ref="structure" minOccurs="1"/>
+        <xs:element ref="postLoop"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- Attributes -->
+  <xs:attribute name="length" type="xs:positiveInteger"/>
+  <xs:attribute name="name" type="xs:NCName"/>
+  <xs:attribute name="peek" type="xs:boolean"/>
+  <xs:attribute name="countType" type="xs:NCName"/>
+  <xs:attribute name="breakType" type="xs:NCName"/>
+  <xs:attribute name="breakOn" type="xs:string"/>
+  <xs:attribute name="value" type="xs:string"/>
+
+  <!-- Attribute groups -->
+  <xs:attributeGroup name="conditionAttributes">
+    <xs:attribute ref="peek" use="optional"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="groupAttributes">
+    <xs:attribute ref="countType" use="optional"/>
+    <xs:attribute ref="breakOn" use="optional"/>
+    <xs:attribute ref="breakType" use="optional"/>
+    <xs:attribute ref="peek" use="optional"/>
+  </xs:attributeGroup>
+</xs:schema>
