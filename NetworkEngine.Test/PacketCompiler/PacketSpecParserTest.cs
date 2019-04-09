@@ -51,11 +51,11 @@ namespace NetworkEngine.Test.PacketCompiler
         {
             var doc = new XmlDocument();
             doc.LoadXml(@"<?xml version=""1.0"" encoding=""utf-8""?>
-<NotPacket />");
+<Case />");
 
             var parser = new PacketSpecParser(doc);
             Assert.That(() => parser.Parse(), Throws.InstanceOf<InvalidPacketSpecException>()
-                                                        .With.Property(nameof(InvalidPacketSpecException.Result)).EqualTo(ValidationResult.InvalidPacketNode));
+                                                        .With.Property(nameof(InvalidPacketSpecException.Result)).EqualTo(ValidationResult.SchemaError));
         }
 
         private static PacketDataType GetEnum(string name) => Enum.Parse<PacketDataType>(char.ToUpper(name[0]) + name.Substring(1));

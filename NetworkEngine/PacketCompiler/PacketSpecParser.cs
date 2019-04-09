@@ -2,11 +2,13 @@
 
 using System;
 using System.Xml;
+using System.Xml.Schema;
 
 namespace NetworkEngine.PacketCompiler
 {
     public class PacketSpecParser
     {
+        private const string SchemaUri = "NetworkPacket.xsd";
         private const string PacketElement = "Packet";
         private const string NameAttribute = "name";
         private const string LengthAttribute = "length";
@@ -67,14 +69,33 @@ namespace NetworkEngine.PacketCompiler
 
         private static ValidationState ValidatePacketStructure(XmlDocument specXml)
         {
-            var result = ValidationResult.Ok;
+            var resultState = new ValidationState(ValidationResult.Ok);
 
-            if (!string.Equals(specXml.DocumentElement?.Name, PacketElement, StringComparison.OrdinalIgnoreCase))
+            var validationMessage = string.Empty;
+            var validationLineNumber = 0;
+            XmlSeverityType? validationSeverity = null;
+            var validationErrorFound = false;
+
+            specXml.Schemas.Add(string.Empty, SchemaUri);
+            specXml.Validate(ValidationHandler);
+
+            if (validationErrorFound)
             {
-                result = ValidationResult.InvalidPacketNode;
+                resultState = new ValidationState(ValidationResult.SchemaError,
+                    validationSeverity,
+                    validationMessage,
+                    validationLineNumber);
             }
 
-            return new ValidationState(result);
+            return resultState;
+
+            void ValidationHandler(object sender, ValidationEventArgs e)
+            {
+                validationSeverity = e.Severity;
+                validationLineNumber = e.Exception.LineNumber;
+                validationMessage = e.Message;
+                validationErrorFound = true;
+            }
         }
 
         private static string GetPacketName(XmlDocument specXml)
