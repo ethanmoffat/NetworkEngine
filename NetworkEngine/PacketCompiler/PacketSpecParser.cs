@@ -11,6 +11,7 @@ namespace NetworkEngine.PacketCompiler
         private const string SchemaUri = "NetworkPacket.xsd";
         private const string PacketElement = "Packet";
         private const string NameAttribute = "name";
+        private const string BaseAttribute = "base";
         private const string LengthAttribute = "length";
 
         private readonly XmlDocument _specXml;
@@ -41,6 +42,10 @@ namespace NetworkEngine.PacketCompiler
             var packetName = GetPacketName(_specXml);
             var packetState = PacketState.Create(packetName);
 
+            var basePacketName = GetBasePacket(_specXml);
+            if (!string.IsNullOrEmpty(basePacketName))
+                packetState = packetState.WithBasePacket(basePacketName);
+
             var node = _specXml?.DocumentElement?.FirstChild;
             while (node?.NextSibling != null)
             {
@@ -64,7 +69,7 @@ namespace NetworkEngine.PacketCompiler
 
             return new PacketDataElement(dataType, length, elementName);
 
-            string FixCasing(string name) => char.ToUpper(name[0]) + name.Substring(1);
+            string FixCasing(string name) => char.ToUpper(name[0]) + name.Substring(1).ToLower();
         }
 
         private static ValidationState ValidatePacketStructure(XmlDocument specXml)
@@ -101,8 +106,13 @@ namespace NetworkEngine.PacketCompiler
         private static string GetPacketName(XmlDocument specXml)
         {
             var packetElement = specXml.DocumentElement;
-            var nameAttribute = packetElement?.Attributes[NameAttribute]?.Value ?? string.Empty;
-            return nameAttribute;
+            return packetElement.Attributes[NameAttribute].Value ?? string.Empty;
+        }
+
+        private static string GetBasePacket(XmlDocument specXml)
+        {
+            var packetElement = specXml.DocumentElement;
+            return packetElement.Attributes[BaseAttribute]?.Value ?? string.Empty;
         }
     }
 }

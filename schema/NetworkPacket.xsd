@@ -3,7 +3,8 @@
   <xs:element name="packet">
     <xs:complexType>
       <xs:group ref="allTypes"/>
-      <xs:attribute ref="name"/>
+      <xs:attribute ref="name" use="required"/>
+      <xs:attribute ref="base" use="optional"/>
     </xs:complexType>
   </xs:element>
 
@@ -167,6 +168,7 @@
   <xs:attribute name="breakType" type="xs:NCName"/>
   <xs:attribute name="breakOn" type="xs:string"/>
   <xs:attribute name="value" type="xs:string"/>
+  <xs:attribute name="base" type="xs:NCName"/>
 
   <!-- Attribute groups -->
   <xs:attributeGroup name="conditionAttributes">

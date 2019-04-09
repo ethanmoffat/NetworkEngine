@@ -58,6 +58,20 @@ namespace NetworkEngine.Test.PacketCompiler
                                                         .With.Property(nameof(InvalidPacketSpecException.Result)).EqualTo(ValidationResult.SchemaError));
         }
 
+        [Test]
+        public void GivenPacketWithBase_WhenParse_ReferencesBasePacket()
+        {
+            var doc = new XmlDocument();
+            doc.Load("PacketCompiler/Samples/derived.xml");
+
+            var expectedBasePacket = doc.SelectSingleNode("/packet/@base").Value;
+
+            var parser = new PacketSpecParser(doc);
+            var state = parser.Parse();
+
+            Assert.That(state.BasePacketName, Is.EqualTo(expectedBasePacket));
+        }
+
         private static PacketDataType GetEnum(string name) => Enum.Parse<PacketDataType>(char.ToUpper(name[0]) + name.Substring(1));
     }
 }

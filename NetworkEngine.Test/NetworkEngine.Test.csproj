@@ -10,6 +10,13 @@
     <None Remove="PacketCompiler\Samples\base.xml" />
     <None Remove="PacketCompiler\Samples\basic.xml" />
     <None Remove="PacketCompiler\Samples\comprehensive.xml" />
+    <None Remove="PacketCompiler\Samples\derived.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="PacketCompiler\Samples\derived.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
