@@ -129,12 +129,12 @@ namespace NetworkEngine.PacketCompiler
 
             if (resultState.Status == ValidationResult.Ok)
             {
-                var allNodes = ToEnumerable<XmlNode>(specXml.SelectNodes("//*").GetEnumerator());
-                var groupedByParent = allNodes.GroupBy(x => new {x.ParentNode, x.InnerText});
+                var allNodes = ToEnumerable<XmlNode>(specXml.SelectNodes("/packet//*").GetEnumerator());
+                var groupedByParent = allNodes.GroupBy(x => x.ParentNode).ToList();
                 foreach (var grouping in groupedByParent)
                 {
-                    var groupedByInnerText = grouping.GroupBy(x => x.InnerText);
-                    if (groupedByInnerText.Any(x => x.Count() > 1))
+                    var groupedByInnerXml = grouping.GroupBy(x => x.InnerXml);
+                    if (groupedByInnerXml.Any(x => x.Count() > 1))
                     {
                         resultState = new ValidationState(ValidationResult.ElementRedefinition);
                     }

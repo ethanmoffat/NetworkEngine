@@ -128,12 +128,29 @@ namespace NetworkEngine.Test.PacketCompiler
 </packet>");
 
                 var parser = new PacketSpecParser(doc);
+                Assert.That(() => parser.Parse(),
+                    Throws.InstanceOf<InvalidPacketSpecException>().With
+                        .Property(nameof(InvalidPacketSpecException.Result)).EqualTo(ValidationResult.ElementRedefinition));
                 Assert.That(() => parser.Parse(ParseOptions.SkipSchemaValidation),
                     Throws.InstanceOf<InvalidPacketSpecException>().With
                         .Property(nameof(InvalidPacketSpecException.Result)).EqualTo(ValidationResult.ElementRedefinition));
-                Assert.That(() => parser.Parse(ParseOptions.None),
-                    Throws.InstanceOf<InvalidPacketSpecException>().With
-                        .Property(nameof(InvalidPacketSpecException.Result)).EqualTo(ValidationResult.ElementRedefinition));
+            }
+
+            [Test]
+            public void GivenDuplicateElementNames_DifferentScopes_WhenParse_DoesNotThrowException()
+            {
+                var doc = new XmlDocument();
+                doc.LoadXml(@"<?xml version=""1.0"" encoding=""utf-8""?>
+<packet name=""test"">
+  <byte>duplicate</byte>
+  <structure name=""teststruct"">
+    <byte>duplicate</byte>
+  </structure>
+</packet>");
+
+                var parser = new PacketSpecParser(doc);
+                parser.Parse();
+                parser.Parse(ParseOptions.SkipSchemaValidation);
             }
         }
 
