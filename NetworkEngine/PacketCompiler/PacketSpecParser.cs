@@ -1,6 +1,7 @@
 ﻿// Original Work Copyright (c) Ethan Moffat 2014-2019
 
 using System;
+using System.Collections.Generic;
 using System.Xml;
 using System.Xml.Schema;
 
@@ -9,7 +10,7 @@ namespace NetworkEngine.PacketCompiler
     public class PacketSpecParser
     {
         private const string SchemaUri = "NetworkPacket.xsd";
-        private const string PacketElement = "Packet";
+        private const string PacketElement = "packet";
         private const string NameAttribute = "name";
         private const string BaseAttribute = "base";
         private const string LengthAttribute = "length";
@@ -47,29 +48,50 @@ namespace NetworkEngine.PacketCompiler
                 packetState = packetState.WithBasePacket(basePacketName);
 
             var node = _specXml?.DocumentElement?.FirstChild;
-            while (node?.NextSibling != null)
+            while (node != null)
             {
-                var dataElement = GetNextDataElement(node);
+                var dataElement = XmlNodeToDataElement(node);
                 packetState = packetState.WithData(dataElement);
-
                 node = node.NextSibling;
             }
 
             return packetState;
         }
 
-        private static PacketDataElement GetNextDataElement(XmlNode node)
+        private static PacketDataElement XmlNodeToDataElement(XmlNode node)
         {
-            var dataType = (PacketDataType)Enum.Parse(typeof(PacketDataType), FixCasing(node.Name));
+            var parseResult = Enum.TryParse(node.Name, result: out PacketDataType dataType, ignoreCase: true);
+            if (!parseResult)
+            {
+                throw new ArgumentException($"Unable to parse packet data type of {node.Name}");
+            }
 
             var attribute = node.Attributes?[LengthAttribute];
             var length = int.Parse(attribute?.Value ?? "0");
 
-            var elementName = node.InnerText;
+            var elementName = dataType == PacketDataType.Structure
+                              ? node.Attributes?[NameAttribute]?.Value 
+                              : node.InnerText;
 
-            return new PacketDataElement(dataType, length, elementName);
+            var childElements = new List<PacketDataElement>();
+            if (dataType == PacketDataType.Structure)
+            {
+                childElements.AddRange(ProcessStructure(node.ChildNodes));
+            }
 
-            string FixCasing(string name) => char.ToUpper(name[0]) + name.Substring(1).ToLower();
+            return new PacketDataElement(dataType, length, elementName, childElements);
+        }
+
+        private static IReadOnlyList<PacketDataElement> ProcessStructure(XmlNodeList childNodes)
+        {
+            var retList = new List<PacketDataElement>();
+
+            foreach (XmlNode node in childNodes)
+            {
+                retList.Add(XmlNodeToDataElement(node));
+            }
+
+            return retList;
         }
 
         private static ValidationState ValidatePacketStructure(XmlDocument specXml, ParseOptions options)

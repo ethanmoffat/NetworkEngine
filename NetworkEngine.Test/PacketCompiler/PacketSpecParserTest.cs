@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml;
 using NetworkEngine.PacketCompiler;
 using NUnit.Framework;
@@ -47,7 +48,7 @@ namespace NetworkEngine.Test.PacketCompiler
         }
 
         [Test]
-        public void GivenInvalidRootElement_WhenParse_ThrowsInvalidPacketSpecException()
+        public void GivenInvalidRootElement_WhenParse_ThrowsExceptionWithSchemaError()
         {
             var doc = new XmlDocument();
             doc.LoadXml(@"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -83,6 +84,34 @@ namespace NetworkEngine.Test.PacketCompiler
             var state = parser.Parse();
 
             Assert.That(state.BasePacketName, Is.EqualTo(expectedBasePacket));
+        }
+
+        [Test]
+        public void GivenPacketWithStructure_WhenParse_StructureIsParsed()
+        {
+            var doc = new XmlDocument();
+            doc.Load("PacketCompiler/Samples/structure.xml");
+
+            var structureNode = doc.SelectSingleNode("/packet/structure");
+            var expectedStructureName = structureNode.Attributes["name"].Value;
+            var expectedTypesAndNames = new List<(PacketDataType Type, string Name)>();
+            for (int i = 0; i < structureNode.ChildNodes.Count; ++i)
+                expectedTypesAndNames.Add((GetEnum(structureNode.ChildNodes[i].Name), structureNode.ChildNodes[i].InnerText));
+
+            var parser = new PacketSpecParser(doc);
+            var state = parser.Parse();
+
+            Assert.That(state.Data, Has.All.With.Property(nameof(PacketDataElement.DataType)).EqualTo(PacketDataType.Structure));
+
+            var structureToValidate = state.Data.Single();
+            Assert.That(structureToValidate.Name, Is.EqualTo(expectedStructureName));
+
+            for (int i = 0; i < structureToValidate.Members.Count; ++i)
+            {
+                var nextElement = structureToValidate.Members[i];
+                Assert.That(nextElement.DataType, Is.EqualTo(expectedTypesAndNames[i].Type));
+                Assert.That(nextElement.Name, Is.EqualTo(expectedTypesAndNames[i].Name));
+            }
         }
 
         private static PacketDataType GetEnum(string name) => Enum.Parse<PacketDataType>(char.ToUpper(name[0]) + name.Substring(1));

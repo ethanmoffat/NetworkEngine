@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<packet name="structureTest">
+  <structure name="testStruct">
+    <byte>firstByte</byte>
+    <short>firstShort</short>
+    <short>secondShort</short>
+    <short>thirdShort</short>
+    <int>firstInt</int>
+  </structure>
+</packet>

@@ -11,6 +11,7 @@
     <None Remove="PacketCompiler\Samples\basic.xml" />
     <None Remove="PacketCompiler\Samples\comprehensive.xml" />
     <None Remove="PacketCompiler\Samples\derived.xml" />
+    <None Remove="PacketCompiler\Samples\structure.xml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,6 +28,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="PacketCompiler\Samples\comprehensive.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PacketCompiler\Samples\structure.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
