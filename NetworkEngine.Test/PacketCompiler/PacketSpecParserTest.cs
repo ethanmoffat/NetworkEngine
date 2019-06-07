@@ -48,31 +48,6 @@ namespace NetworkEngine.Test.PacketCompiler
         }
 
         [Test]
-        public void GivenInvalidRootElement_WhenParse_ThrowsExceptionWithSchemaError()
-        {
-            var doc = new XmlDocument();
-            doc.LoadXml(@"<?xml version=""1.0"" encoding=""utf-8""?>
-<Case />");
-
-            var parser = new PacketSpecParser(doc);
-            Assert.That(() => parser.Parse(), Throws.InstanceOf<InvalidPacketSpecException>()
-                                                        .With.Property(nameof(InvalidPacketSpecException.Result)).EqualTo(ValidationResult.SchemaError));
-        }
-
-        [Test]
-        public void GivenInvalidRootElement_WhenParseWithoutSchemaValidation_ThrowsExceptionWithInvalidRootElement()
-        {
-            var doc = new XmlDocument();
-            doc.LoadXml(@"<?xml version=""1.0"" encoding=""utf-8""?>
-<Case />");
-
-            var parser = new PacketSpecParser(doc);
-            Assert.That(() => parser.Parse(ParseOptions.SkipSchemaValidation),
-                        Throws.InstanceOf<InvalidPacketSpecException>().With.Property(nameof(InvalidPacketSpecException.Result))
-                                                                            .EqualTo(ValidationResult.InvalidRootElement));
-        }
-
-        [Test]
         public void GivenPacketWithBase_WhenParse_ReferencesBasePacket()
         {
             var doc = new XmlDocument();
@@ -111,6 +86,36 @@ namespace NetworkEngine.Test.PacketCompiler
                 var nextElement = structureToValidate.Members[i];
                 Assert.That(nextElement.DataType, Is.EqualTo(expectedTypesAndNames[i].Type));
                 Assert.That(nextElement.Name, Is.EqualTo(expectedTypesAndNames[i].Name));
+            }
+        }
+
+        [TestFixture]
+        public class InvalidPackets
+        {
+            [Test]
+            public void GivenInvalidRootElement_WhenParse_ThrowsExceptionWithSchemaError()
+            {
+                var doc = new XmlDocument();
+                doc.LoadXml(@"<?xml version=""1.0"" encoding=""utf-8""?>
+<Case />");
+
+                var parser = new PacketSpecParser(doc);
+                Assert.That(() => parser.Parse(), Throws.InstanceOf<InvalidPacketSpecException>()
+                    .With.Property(nameof(InvalidPacketSpecException.Result)).EqualTo(ValidationResult.SchemaError));
+            }
+
+            [Test]
+            public void GivenInvalidRootElement_WhenParseWithoutSchemaValidation_ThrowsExceptionWithInvalidRootElement()
+            {
+                var doc = new XmlDocument();
+                doc.LoadXml(@"<?xml version=""1.0"" encoding=""utf-8""?>
+<Case />");
+
+                var parser = new PacketSpecParser(doc);
+                Assert.That(() => parser.Parse(ParseOptions.SkipSchemaValidation),
+                    Throws.InstanceOf<InvalidPacketSpecException>().With
+                        .Property(nameof(InvalidPacketSpecException.Result))
+                        .EqualTo(ValidationResult.InvalidRootElement));
             }
         }
 
