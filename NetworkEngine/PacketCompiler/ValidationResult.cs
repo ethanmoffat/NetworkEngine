@@ -6,6 +6,7 @@ namespace NetworkEngine.PacketCompiler
     {
         Ok,
         SchemaError,
-        InvalidRootElement
+        InvalidRootElement,
+        ElementRedefinition
     }
 }

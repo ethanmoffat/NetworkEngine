@@ -114,8 +114,26 @@ namespace NetworkEngine.Test.PacketCompiler
                 var parser = new PacketSpecParser(doc);
                 Assert.That(() => parser.Parse(ParseOptions.SkipSchemaValidation),
                     Throws.InstanceOf<InvalidPacketSpecException>().With
-                        .Property(nameof(InvalidPacketSpecException.Result))
-                        .EqualTo(ValidationResult.InvalidRootElement));
+                        .Property(nameof(InvalidPacketSpecException.Result)).EqualTo(ValidationResult.InvalidRootElement));
+            }
+
+            [Test]
+            public void GivenDuplicateElementNames_WhenParse_ThrowsException()
+            {
+                var doc = new XmlDocument();
+                doc.LoadXml(@"<?xml version=""1.0"" encoding=""utf-8""?>
+<packet name=""test"">
+  <byte>duplicate</byte>
+  <byte>duplicate</byte>
+</packet>");
+
+                var parser = new PacketSpecParser(doc);
+                Assert.That(() => parser.Parse(ParseOptions.SkipSchemaValidation),
+                    Throws.InstanceOf<InvalidPacketSpecException>().With
+                        .Property(nameof(InvalidPacketSpecException.Result)).EqualTo(ValidationResult.ElementRedefinition));
+                Assert.That(() => parser.Parse(ParseOptions.None),
+                    Throws.InstanceOf<InvalidPacketSpecException>().With
+                        .Property(nameof(InvalidPacketSpecException.Result)).EqualTo(ValidationResult.ElementRedefinition));
             }
         }
 

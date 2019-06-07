@@ -1,7 +1,9 @@
 ﻿// Original Work Copyright (c) Ethan Moffat 2014-2019
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml;
 using System.Xml.Schema;
 
@@ -125,6 +127,20 @@ namespace NetworkEngine.PacketCompiler
                 }
             }
 
+            if (resultState.Status == ValidationResult.Ok)
+            {
+                var allNodes = ToEnumerable<XmlNode>(specXml.SelectNodes("//*").GetEnumerator());
+                var groupedByParent = allNodes.GroupBy(x => new {x.ParentNode, x.InnerText});
+                foreach (var grouping in groupedByParent)
+                {
+                    var groupedByInnerText = grouping.GroupBy(x => x.InnerText);
+                    if (groupedByInnerText.Any(x => x.Count() > 1))
+                    {
+                        resultState = new ValidationState(ValidationResult.ElementRedefinition);
+                    }
+                }
+            }
+
             return resultState;
 
             void ValidationHandler(object sender, ValidationEventArgs e)
@@ -133,6 +149,12 @@ namespace NetworkEngine.PacketCompiler
                 validationLineNumber = e.Exception.LineNumber;
                 validationMessage = e.Message;
                 validationErrorFound = true;
+            }
+
+            IEnumerable<T> ToEnumerable<T>(IEnumerator enumerator)
+            {
+                while (enumerator.MoveNext())
+                    yield return (T)enumerator.Current;
             }
         }
 
