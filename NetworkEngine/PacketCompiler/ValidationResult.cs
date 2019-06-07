@@ -5,6 +5,7 @@ namespace NetworkEngine.PacketCompiler
     public enum ValidationResult
     {
         Ok,
-        SchemaError
+        SchemaError,
+        InvalidRootElement
     }
 }

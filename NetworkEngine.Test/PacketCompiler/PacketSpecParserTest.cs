@@ -59,6 +59,19 @@ namespace NetworkEngine.Test.PacketCompiler
         }
 
         [Test]
+        public void GivenInvalidRootElement_WhenParseWithoutSchemaValidation_ThrowsExceptionWithInvalidRootElement()
+        {
+            var doc = new XmlDocument();
+            doc.LoadXml(@"<?xml version=""1.0"" encoding=""utf-8""?>
+<Case />");
+
+            var parser = new PacketSpecParser(doc);
+            Assert.That(() => parser.Parse(ParseOptions.SkipSchemaValidation),
+                        Throws.InstanceOf<InvalidPacketSpecException>().With.Property(nameof(InvalidPacketSpecException.Result))
+                                                                            .EqualTo(ValidationResult.InvalidRootElement));
+        }
+
+        [Test]
         public void GivenPacketWithBase_WhenParse_ReferencesBasePacket()
         {
             var doc = new XmlDocument();

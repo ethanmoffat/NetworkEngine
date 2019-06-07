@@ -33,7 +33,7 @@ namespace NetworkEngine.PacketCompiler
 
         public PacketState Parse(ParseOptions options = ParseOptions.None)
         {
-            var validationResult = ValidatePacketStructure(_specXml);
+            var validationResult = ValidatePacketStructure(_specXml, options);
             if (validationResult.Status != ValidationResult.Ok)
             {
                 throw new InvalidPacketSpecException(validationResult);
@@ -72,7 +72,7 @@ namespace NetworkEngine.PacketCompiler
             string FixCasing(string name) => char.ToUpper(name[0]) + name.Substring(1).ToLower();
         }
 
-        private static ValidationState ValidatePacketStructure(XmlDocument specXml)
+        private static ValidationState ValidatePacketStructure(XmlDocument specXml, ParseOptions options)
         {
             var resultState = new ValidationState(ValidationResult.Ok);
 
@@ -81,15 +81,26 @@ namespace NetworkEngine.PacketCompiler
             XmlSeverityType? validationSeverity = null;
             var validationErrorFound = false;
 
-            specXml.Schemas.Add(string.Empty, SchemaUri);
-            specXml.Validate(ValidationHandler);
-
-            if (validationErrorFound)
+            if (!options.HasFlag(ParseOptions.SkipSchemaValidation))
             {
-                resultState = new ValidationState(ValidationResult.SchemaError,
-                    validationSeverity,
-                    validationMessage,
-                    validationLineNumber);
+                specXml.Schemas.Add(string.Empty, SchemaUri);
+                specXml.Validate(ValidationHandler);
+
+                if (validationErrorFound)
+                {
+                    resultState = new ValidationState(ValidationResult.SchemaError,
+                        validationSeverity,
+                        validationMessage,
+                        validationLineNumber);
+                }
+            }
+            else
+            {
+                if (specXml.DocumentElement == null ||
+                    !string.Equals(specXml.DocumentElement.Name, PacketElement, StringComparison.OrdinalIgnoreCase))
+                {
+                    resultState = new ValidationState(ValidationResult.InvalidRootElement);
+                }
             }
 
             return resultState;
