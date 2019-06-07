@@ -38,7 +38,7 @@
   </xs:group>
   <xs:group name="allTypes">
     <xs:sequence>
-      <xs:choice maxOccurs="unbounded">
+      <xs:choice minOccurs="1" maxOccurs="unbounded">
         <xs:element ref="byte"/>
         <xs:element ref="char"/>
         <xs:element ref="short"/>
