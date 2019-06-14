@@ -1,11 +1,11 @@
 ﻿// Original Work Copyright (c) Ethan Moffat 2014-2019
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using System.Xml.Schema;
+using NetworkEngine.Extensions;
 using NetworkEngine.PacketCompiler.State;
 
 namespace NetworkEngine.PacketCompiler
@@ -92,7 +92,7 @@ namespace NetworkEngine.PacketCompiler
             else if (dataType == PacketDataType.Condition)
             {
                 memberState = ProcessCondition(node.Attributes[PeekName],
-                                               ToEnumerable<XmlNode>(node.ChildNodes.GetEnumerator()));
+                                               node.ChildNodes.GetEnumerator().ToEnumerable<XmlNode>());
             }
 
             return new PacketDataElement(dataType, length, elementName, memberState);
@@ -153,7 +153,7 @@ namespace NetworkEngine.PacketCompiler
 
             if (resultState.Status == ValidationResult.Ok)
             {
-                var allNodes = ToEnumerable<XmlNode>(specXml.SelectNodes("/packet//*").GetEnumerator());
+                var allNodes = specXml.SelectNodes("/packet//*").GetEnumerator().ToEnumerable<XmlNode>();
                 var groupedByParent = allNodes.Where(x => x.Name != "case").GroupBy(x => x.ParentNode).ToList();
                 foreach (var grouping in groupedByParent)
                 {
@@ -174,12 +174,6 @@ namespace NetworkEngine.PacketCompiler
                 validationMessage = e.Message;
                 validationErrorFound = true;
             }
-        }
-
-        private static IEnumerable<T> ToEnumerable<T>(IEnumerator enumerator)
-        {
-            while (enumerator.MoveNext())
-                yield return (T)enumerator.Current;
         }
 
         private static string GetPacketName(XmlDocument specXml)
