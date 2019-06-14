@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!-- Sample packet for the ACCOUNT_LOGIN packet response from Endless Online -->
+<packet name="AccountLoginCharacters">
+  <!--
+    Group has
+    - a count of type char (number of characters)
+    - a delimiter between each entry of type byte that should be value 255
+    - the delimiter is *not* peeked but is consumed from the packet stream
+  -->
+  <group countType="char" breakOn="255" breakType="byte" peek="false" >
+    <preloop>
+      <!-- One byte is skipped before starting looping -->
+      <byte>SkippedByte</byte>
+    </preloop>
+    <structure name="AccountCharacter">
+      <breakString>Name</breakString>
+      <int>Id</int>
+      <char>Level</char>
+
+      <char>Gender</char>
+      <char>HairStyle</char>
+      <char>HairColor</char>
+      <char>Race</char>
+
+      <char>AdminLevel</char>
+
+      <short>Boots</short>
+      <short>Armor</short>
+      <short>Hat</short>
+      <short>Shield</short>
+      <short>Weapon</short>
+    </structure>
+    <postloop>
+      <!-- Final byte is expected to be equal to 255 -->
+      <byte>FinalDelimiter</byte>
+    </postloop>
+  </group>
+</packet>

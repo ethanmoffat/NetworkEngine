@@ -12,6 +12,7 @@
     <None Remove="PacketCompiler\Samples\comprehensive.xml" />
     <None Remove="PacketCompiler\Samples\condition.xml" />
     <None Remove="PacketCompiler\Samples\derived.xml" />
+    <None Remove="PacketCompiler\Samples\group.xml" />
     <None Remove="PacketCompiler\Samples\structure.xml" />
   </ItemGroup>
 
@@ -32,6 +33,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="PacketCompiler\Samples\comprehensive.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PacketCompiler\Samples\group.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="PacketCompiler\Samples\structure.xml">
