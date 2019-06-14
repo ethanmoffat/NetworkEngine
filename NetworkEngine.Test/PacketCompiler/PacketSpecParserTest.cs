@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using NetworkEngine.PacketCompiler;
+using NetworkEngine.PacketCompiler.State;
 using NUnit.Framework;
 
 namespace NetworkEngine.Test.PacketCompiler
@@ -81,12 +82,48 @@ namespace NetworkEngine.Test.PacketCompiler
             var structureToValidate = state.Data.Single();
             Assert.That(structureToValidate.Name, Is.EqualTo(expectedStructureName));
 
-            for (int i = 0; i < structureToValidate.Members.Count; ++i)
+            var members = structureToValidate.MemberState.Members;
+            for (int i = 0; i < members.Count; ++i)
             {
-                var nextElement = structureToValidate.Members[i];
+                var nextElement = members[i];
                 Assert.That(nextElement.DataType, Is.EqualTo(expectedTypesAndNames[i].Type));
                 Assert.That(nextElement.Name, Is.EqualTo(expectedTypesAndNames[i].Name));
             }
+        }
+
+        [Test]
+        public void GivenPacketWithCondition_WhenParse_StructureIsParsed()
+        {
+            var doc = new XmlDocument();
+            doc.Load("PacketCompiler/Samples/condition.xml");
+
+            var expectedFirstConditionPeek = Convert.ToBoolean(doc.SelectSingleNode("/packet/condition[1]/@peek").Value);
+            var expectedSecondConditionPeek = Convert.ToBoolean(doc.SelectSingleNode("/packet/condition[2]/@peek").Value);
+
+            var expectedFirstConditionType = doc.SelectSingleNode("/packet/condition[1]/*[1]");
+            var expectedSecondConditionType = doc.SelectSingleNode("/packet/condition[2]/*[1]");
+
+            var parser = new PacketSpecParser(doc);
+            var state = parser.Parse();
+
+            Assert.That(state.Data, Has.Count.EqualTo(2));
+            Assert.That(state.Data, Has.All.With.Property(nameof(PacketDataElement.DataType)).EqualTo(PacketDataType.Condition));
+
+            var firstCondition = state.Data[0];
+            var secondCondition = state.Data[1];
+
+            Assert.That(firstCondition.Name, Is.Null.Or.Empty);
+            Assert.That(secondCondition.Name, Is.Null.Or.Empty);
+
+            var firstMem = firstCondition.MemberState;
+            Assert.That(firstMem[MemberProperty.Peek], Is.EqualTo(expectedFirstConditionPeek));
+            Assert.That(firstMem.Members[0].Name, Is.EqualTo(expectedFirstConditionType.InnerText));
+            Assert.That(firstMem.Members[0].DataType, Is.EqualTo(GetEnum(expectedFirstConditionType.Name)));
+
+            var secondMem = secondCondition.MemberState;
+            Assert.That(secondMem[MemberProperty.Peek], Is.EqualTo(expectedSecondConditionPeek));
+            Assert.That(secondMem.Members[0].Name, Is.EqualTo(expectedSecondConditionType.InnerText));
+            Assert.That(secondMem.Members[0].DataType, Is.EqualTo(GetEnum(expectedSecondConditionType.Name)));
         }
 
         [TestFixture]

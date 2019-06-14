@@ -11,6 +11,7 @@ namespace NetworkEngine.PacketCompiler
         Int,
         String,
         EndString,
-        Structure
+        Structure,
+        Condition
     }
 }

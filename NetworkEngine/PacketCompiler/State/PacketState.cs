@@ -2,7 +2,7 @@
 
 using System.Collections.Generic;
 
-namespace NetworkEngine.PacketCompiler
+namespace NetworkEngine.PacketCompiler.State
 {
     public class PacketState
     {

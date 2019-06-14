@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using System.Xml.Schema;
+using NetworkEngine.PacketCompiler.State;
 
 namespace NetworkEngine.PacketCompiler
 {
@@ -16,6 +17,7 @@ namespace NetworkEngine.PacketCompiler
         private const string NameAttribute = "name";
         private const string BaseAttribute = "base";
         private const string LengthAttribute = "length";
+        private const string PeekName = "peek";
 
         private readonly XmlDocument _specXml;
         private readonly string _filePath;
@@ -71,20 +73,32 @@ namespace NetworkEngine.PacketCompiler
             var attribute = node.Attributes?[LengthAttribute];
             var length = int.Parse(attribute?.Value ?? "0");
 
-            var elementName = dataType == PacketDataType.Structure
-                              ? node.Attributes?[NameAttribute]?.Value 
-                              : node.InnerText;
-
-            var childElements = new List<PacketDataElement>();
-            if (dataType == PacketDataType.Structure)
+            var elementName = node.InnerText;
+            switch (dataType)
             {
-                childElements.AddRange(ProcessStructure(node.ChildNodes));
+                case PacketDataType.Structure:
+                    elementName = node.Attributes?[NameAttribute]?.Value;
+                    break;
+                case PacketDataType.Condition:
+                    elementName = string.Empty;
+                    break;
             }
 
-            return new PacketDataElement(dataType, length, elementName, childElements);
+            IMemberState memberState = null;
+            if (dataType == PacketDataType.Structure)
+            {
+                memberState = ProcessStructure(node.ChildNodes);
+            }
+            else if (dataType == PacketDataType.Condition)
+            {
+                memberState = ProcessCondition(node.Attributes[PeekName],
+                                               ToEnumerable<XmlNode>(node.ChildNodes.GetEnumerator()));
+            }
+
+            return new PacketDataElement(dataType, length, elementName, memberState);
         }
 
-        private static IReadOnlyList<PacketDataElement> ProcessStructure(XmlNodeList childNodes)
+        private static IMemberState ProcessStructure(XmlNodeList childNodes)
         {
             var retList = new List<PacketDataElement>();
 
@@ -93,7 +107,17 @@ namespace NetworkEngine.PacketCompiler
                 retList.Add(XmlNodeToDataElement(node));
             }
 
-            return retList;
+            return new StructureState(retList);
+        }
+
+        private static IMemberState ProcessCondition(XmlAttribute peekAttribute, IEnumerable<XmlNode> childNodes)
+        {
+            var peekValue = bool.Parse(peekAttribute.Value);
+
+            var childNodesList = childNodes.ToList();
+            var testType = XmlNodeToDataElement(childNodesList[0]);
+
+            return new ConditionState(peekValue, testType, null);
         }
 
         private static ValidationState ValidatePacketStructure(XmlDocument specXml, ParseOptions options)
@@ -130,7 +154,7 @@ namespace NetworkEngine.PacketCompiler
             if (resultState.Status == ValidationResult.Ok)
             {
                 var allNodes = ToEnumerable<XmlNode>(specXml.SelectNodes("/packet//*").GetEnumerator());
-                var groupedByParent = allNodes.GroupBy(x => x.ParentNode).ToList();
+                var groupedByParent = allNodes.Where(x => x.Name != "case").GroupBy(x => x.ParentNode).ToList();
                 foreach (var grouping in groupedByParent)
                 {
                     var groupedByInnerXml = grouping.GroupBy(x => x.InnerXml);
@@ -150,12 +174,12 @@ namespace NetworkEngine.PacketCompiler
                 validationMessage = e.Message;
                 validationErrorFound = true;
             }
+        }
 
-            IEnumerable<T> ToEnumerable<T>(IEnumerator enumerator)
-            {
-                while (enumerator.MoveNext())
-                    yield return (T)enumerator.Current;
-            }
+        private static IEnumerable<T> ToEnumerable<T>(IEnumerator enumerator)
+        {
+            while (enumerator.MoveNext())
+                yield return (T)enumerator.Current;
         }
 
         private static string GetPacketName(XmlDocument specXml)

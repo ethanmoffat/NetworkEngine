@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<packet name="ConditionTest">
+  <condition peek="false">
+    <byte>ConditionValue</byte>
+    <case value="0">
+      <byte>SecondByte</byte>
+      <byte>ThirdByte</byte>
+    </case>
+    <case value="1">
+      <byte>SecondByte</byte>
+      <byte>ThirdByte</byte>
+    </case>
+  </condition>
+  <condition peek="true">
+    <byte>ConditionValue</byte>
+    <case value="1">
+      <byte>FirstByte</byte>
+      <byte>SecondByte</byte>
+    </case>
+    <case value="0">
+      <byte>FirstByte</byte>
+      <byte>SecondByte</byte>
+    </case>
+  </condition>
+</packet>
