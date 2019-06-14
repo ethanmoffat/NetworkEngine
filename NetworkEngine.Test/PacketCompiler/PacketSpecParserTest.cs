@@ -120,10 +120,24 @@ namespace NetworkEngine.Test.PacketCompiler
             Assert.That(firstMem.Members[0].Name, Is.EqualTo(expectedFirstConditionType.InnerText));
             Assert.That(firstMem.Members[0].DataType, Is.EqualTo(GetEnum(expectedFirstConditionType.Name)));
 
+            var casesList = (IReadOnlyList<ConditionState.CaseState>) firstMem[MemberProperty.Cases];
+            Assert.That(casesList, Has.Count.EqualTo(2));
+            Assert.That(casesList.First().TestValue, Is.EqualTo("0"));
+            Assert.That(casesList.First().Members, Has.Count.EqualTo(2));
+            Assert.That(casesList.Last().TestValue, Is.EqualTo("1"));
+            Assert.That(casesList.Last().Members, Has.Count.EqualTo(2));
+
             var secondMem = secondCondition.MemberState;
             Assert.That(secondMem[MemberProperty.Peek], Is.EqualTo(expectedSecondConditionPeek));
             Assert.That(secondMem.Members[0].Name, Is.EqualTo(expectedSecondConditionType.InnerText));
             Assert.That(secondMem.Members[0].DataType, Is.EqualTo(GetEnum(expectedSecondConditionType.Name)));
+
+            casesList = (IReadOnlyList<ConditionState.CaseState>)secondMem[MemberProperty.Cases];
+            Assert.That(casesList, Has.Count.EqualTo(2));
+            Assert.That(casesList.First().TestValue, Is.EqualTo("1"));
+            Assert.That(casesList.First().Members, Has.Count.EqualTo(2));
+            Assert.That(casesList.Last().TestValue, Is.EqualTo("0"));
+            Assert.That(casesList.Last().Members, Has.Count.EqualTo(2));
         }
 
         [TestFixture]

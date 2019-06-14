@@ -17,8 +17,11 @@ namespace NetworkEngine.PacketCompiler.State
 
         public class CaseState : BaseMemberState
         {
-            public CaseState(IReadOnlyList<PacketDataElement> members)
+            public string TestValue { get; }
+
+            public CaseState(string testValue, IReadOnlyList<PacketDataElement> members)
             {
+                TestValue = testValue;
                 Members = members;
             }
         }

@@ -17,6 +17,7 @@ namespace NetworkEngine.PacketCompiler
         private const string NameAttribute = "name";
         private const string BaseAttribute = "base";
         private const string LengthAttribute = "length";
+        private const string ValueAttribute = "value";
         private const string PeekName = "peek";
 
         private readonly XmlDocument _specXml;
@@ -117,7 +118,20 @@ namespace NetworkEngine.PacketCompiler
             var childNodesList = childNodes.ToList();
             var testType = XmlNodeToDataElement(childNodesList[0]);
 
-            return new ConditionState(peekValue, testType, null);
+            var casesList = new List<ConditionState.CaseState>();
+            var cases = childNodesList
+                .Where(x => x.Name.Equals("Case", StringComparison.InvariantCultureIgnoreCase))
+                .ToList();
+            foreach (var @case in cases)
+            {
+                var testValue = @case.Attributes[ValueAttribute].Value;
+                var members = @case.ChildNodes
+                    .GetEnumerator().ToEnumerable<XmlNode>()
+                    .Select(XmlNodeToDataElement).ToList();
+                casesList.Add(new ConditionState.CaseState(testValue, members));
+            }
+
+            return new ConditionState(peekValue, testType, casesList);
         }
 
         private static ValidationState ValidatePacketStructure(XmlDocument specXml, ParseOptions options)
