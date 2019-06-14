@@ -30,6 +30,7 @@
         <xs:element ref="int"/>
         <xs:element ref="skip"/>
         <xs:element ref="string"/>
+        <xs:element ref="breakString"/>
         <xs:element ref="structure"/>
         <xs:element ref="condition"/>
       </xs:choice>
@@ -46,6 +47,7 @@
         <xs:element ref="int"/>
         <xs:element ref="skip"/>
         <xs:element ref="string"/>
+        <xs:element ref="breakString"/>
         <xs:element ref="structure"/>
         <xs:element ref="condition"/>
         <xs:element ref="group"/>
@@ -109,11 +111,12 @@
     <xs:complexType>
       <xs:simpleContent>
         <xs:extension base="xs:NCName">
-          <xs:attribute ref="length" use="optional"/>
+          <xs:attribute ref="length" use="required"/>
         </xs:extension>
       </xs:simpleContent>
     </xs:complexType>
   </xs:element>
+  <xs:element name="breakString" type="xs:NCName"/>
   <xs:element name="endString" type="xs:NCName"/>
 
   <!-- Complex data types -->
@@ -157,6 +160,7 @@
         <xs:element ref="structure" minOccurs="1"/>
         <xs:element ref="postLoop"/>
       </xs:sequence>
+      <xs:attributeGroup ref="groupAttributes" />
     </xs:complexType>
   </xs:element>
 
