@@ -61,8 +61,11 @@ namespace NetworkEngine.PacketCompiler
             var node = _specXml?.DocumentElement?.FirstChild;
             while (node != null)
             {
-                var dataElement = XmlNodeToDataElement(node);
-                packetState = packetState.WithData(dataElement);
+                if (node.NodeType == XmlNodeType.Element)
+                {
+                    var dataElement = XmlNodeToDataElement(node);
+                    packetState = packetState.WithData(dataElement);
+                }
 
                 node = node.NextSibling;
             }
@@ -72,18 +75,10 @@ namespace NetworkEngine.PacketCompiler
 
         private static PacketDataElement XmlNodeToDataElement(XmlNode node)
         {
-            if (node == null)
-                return null;
-
             var parseResult = Enum.TryParse(node.Name, result: out PacketDataType dataType, ignoreCase: true);
             if (!parseResult)
             {
                 throw new ArgumentException($"Unable to parse packet data type of {node.Name}");
-            }
-
-            if (node.Attributes == null)
-            {
-                throw new ArgumentException($"Attributes are required for XmlNode. XmlNode is of invalid type {node.NodeType}.", nameof(node));
             }
 
             var attribute = node.Attributes[LengthAttribute];

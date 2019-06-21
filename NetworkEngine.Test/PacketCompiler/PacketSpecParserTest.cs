@@ -45,6 +45,11 @@ namespace NetworkEngine.Test.PacketCompiler
             {
                 var nextElement = state.Data[i];
                 Assert.That(nextElement.DataType, Is.EqualTo(expectedTypesAndNames[i].Type));
+
+                if (dataTypeNodes[i].Attributes.Count > 0 && dataTypeNodes[i].Attributes[0].Name.Equals("length"))
+                {
+                    Assert.That(nextElement.Length, Is.EqualTo(int.Parse(dataTypeNodes[i].Attributes[0].Value)));
+                }
             }
         }
 
@@ -115,24 +120,24 @@ namespace NetworkEngine.Test.PacketCompiler
             Assert.That(firstCondition.Name, Is.Null.Or.Empty);
             Assert.That(secondCondition.Name, Is.Null.Or.Empty);
 
-            var firstMem = firstCondition.MemberState;
-            Assert.That(firstMem[MemberProperty.Peek], Is.EqualTo(expectedFirstConditionPeek));
+            var firstMem = (ConditionState)firstCondition.MemberState;
+            Assert.That(firstMem.Peek, Is.EqualTo(expectedFirstConditionPeek));
             Assert.That(firstMem.Members[0].Name, Is.EqualTo(expectedFirstConditionType.InnerText));
             Assert.That(firstMem.Members[0].DataType, Is.EqualTo(GetEnum(expectedFirstConditionType.Name)));
 
-            var casesList = (IReadOnlyList<ConditionState.CaseState>) firstMem[MemberProperty.Cases];
+            var casesList = firstMem.Cases;
             Assert.That(casesList, Has.Count.EqualTo(2));
             Assert.That(casesList.First().TestValue, Is.EqualTo("0"));
             Assert.That(casesList.First().Members, Has.Count.EqualTo(2));
             Assert.That(casesList.Last().TestValue, Is.EqualTo("1"));
             Assert.That(casesList.Last().Members, Has.Count.EqualTo(2));
 
-            var secondMem = secondCondition.MemberState;
-            Assert.That(secondMem[MemberProperty.Peek], Is.EqualTo(expectedSecondConditionPeek));
+            var secondMem = (ConditionState)secondCondition.MemberState;
+            Assert.That(secondMem.Peek, Is.EqualTo(expectedSecondConditionPeek));
             Assert.That(secondMem.Members[0].Name, Is.EqualTo(expectedSecondConditionType.InnerText));
             Assert.That(secondMem.Members[0].DataType, Is.EqualTo(GetEnum(expectedSecondConditionType.Name)));
 
-            casesList = (IReadOnlyList<ConditionState.CaseState>)secondMem[MemberProperty.Cases];
+            casesList = secondMem.Cases;
             Assert.That(casesList, Has.Count.EqualTo(2));
             Assert.That(casesList.First().TestValue, Is.EqualTo("1"));
             Assert.That(casesList.First().Members, Has.Count.EqualTo(2));
@@ -153,24 +158,19 @@ namespace NetworkEngine.Test.PacketCompiler
             Assert.That(state.Data, Has.Exactly(1).With.Property(nameof(PacketDataElement.DataType)).EqualTo(PacketDataType.Group));
 
             var group = doc.SelectSingleNode("/packet/group");
+            var groupState = (GroupState)state.Data[0].MemberState;
 
-            var countType = state.Data[0].MemberState[MemberProperty.CountType];
             var expectedCountType = GetEnum(group.Attributes["countType"].Value);
-            Assert.That(countType, Is.EqualTo(expectedCountType));
+            Assert.That(groupState.CountType, Is.EqualTo(expectedCountType));
 
-            var breakOn = state.Data[0].MemberState[MemberProperty.BreakOn];
             var expectedBreakOn = int.Parse(group.Attributes["breakOn"].Value);
-            Assert.That(breakOn, Is.EqualTo(expectedBreakOn));
+            Assert.That(groupState.BreakOn, Is.EqualTo(expectedBreakOn));
 
-            var breakType = state.Data[0].MemberState[MemberProperty.BreakType];
             var expectedBreakType = GetEnum(group.Attributes["breakType"].Value);
-            Assert.That(breakType, Is.EqualTo(expectedBreakType));
+            Assert.That(groupState.BreakType, Is.EqualTo(expectedBreakType));
 
-            var peek = state.Data[0].MemberState[MemberProperty.Peek];
             var expectedPeek = bool.Parse(group.Attributes["peek"].Value);
-            Assert.That(peek, Is.EqualTo(expectedPeek));
-
-            var groupState = (GroupState) state.Data[0].MemberState;
+            Assert.That(groupState.Peek, Is.EqualTo(expectedPeek));
 
             var expectedPreLoop = GetEnum(doc.SelectSingleNode("/packet/group/preLoop/*[1]").Name);
             Assert.That(groupState.PreLoop.DataType, Is.EqualTo(expectedPreLoop));
@@ -244,6 +244,17 @@ namespace NetworkEngine.Test.PacketCompiler
                 var parser = new PacketSpecParser(doc);
                 parser.Parse();
                 parser.Parse(ParseOptions.SkipSchemaValidation);
+            }
+
+            [Test]
+            public void GivenInvalidNodeType_ThrowsArgumentException()
+            {
+                const string invalidXml = "<packet name=\"thing\"><wrong>thing</wrong></packet>";
+                var doc = new XmlDocument();
+                doc.LoadXml(invalidXml);
+
+                var parser = new PacketSpecParser(doc);
+                Assert.That(() => parser.Parse(ParseOptions.SkipSchemaValidation), Throws.ArgumentException);
             }
         }
 
