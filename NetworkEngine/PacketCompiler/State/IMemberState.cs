@@ -12,6 +12,9 @@ namespace NetworkEngine.PacketCompiler.State
     public enum MemberProperty
     {
         Peek,
-        Cases
+        Cases,
+        CountType,
+        BreakOn,
+        BreakType
     }
 }

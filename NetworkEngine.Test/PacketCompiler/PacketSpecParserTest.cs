@@ -92,7 +92,7 @@ namespace NetworkEngine.Test.PacketCompiler
         }
 
         [Test]
-        public void GivenPacketWithCondition_WhenParse_StructureIsParsed()
+        public void GivenPacketWithCondition_WhenParse_ConditionIsParsed()
         {
             var doc = new XmlDocument();
             doc.Load("PacketCompiler/Samples/condition.xml");
@@ -138,6 +138,48 @@ namespace NetworkEngine.Test.PacketCompiler
             Assert.That(casesList.First().Members, Has.Count.EqualTo(2));
             Assert.That(casesList.Last().TestValue, Is.EqualTo("0"));
             Assert.That(casesList.Last().Members, Has.Count.EqualTo(2));
+        }
+
+        [Test]
+        public void GivenPacketWithGroup_WhenParse_GroupIsParsed()
+        {
+            var doc = new XmlDocument();
+            doc.Load("PacketCompiler/Samples/group.xml");
+
+            var parser = new PacketSpecParser(doc);
+            var state = parser.Parse();
+
+            Assert.That(state.Data, Has.Count.EqualTo(1));
+            Assert.That(state.Data, Has.Exactly(1).With.Property(nameof(PacketDataElement.DataType)).EqualTo(PacketDataType.Group));
+
+            var group = doc.SelectSingleNode("/packet/group");
+
+            var countType = state.Data[0].MemberState[MemberProperty.CountType];
+            var expectedCountType = GetEnum(group.Attributes["countType"].Value);
+            Assert.That(countType, Is.EqualTo(expectedCountType));
+
+            var breakOn = state.Data[0].MemberState[MemberProperty.BreakOn];
+            var expectedBreakOn = int.Parse(group.Attributes["breakOn"].Value);
+            Assert.That(breakOn, Is.EqualTo(expectedBreakOn));
+
+            var breakType = state.Data[0].MemberState[MemberProperty.BreakType];
+            var expectedBreakType = GetEnum(group.Attributes["breakType"].Value);
+            Assert.That(breakType, Is.EqualTo(expectedBreakType));
+
+            var peek = state.Data[0].MemberState[MemberProperty.Peek];
+            var expectedPeek = bool.Parse(group.Attributes["peek"].Value);
+            Assert.That(peek, Is.EqualTo(expectedPeek));
+
+            var groupState = (GroupState) state.Data[0].MemberState;
+
+            var expectedPreLoop = GetEnum(doc.SelectSingleNode("/packet/group/preLoop/*[1]").Name);
+            Assert.That(groupState.PreLoop.DataType, Is.EqualTo(expectedPreLoop));
+
+            var expectedPostLoop = GetEnum(doc.SelectSingleNode("/packet/group/postLoop/*[1]").Name);
+            Assert.That(groupState.PostLoop.DataType, Is.EqualTo(expectedPostLoop));
+
+            var expectedStructure = doc.SelectSingleNode("/packet/group/structure/@name").Value;
+            Assert.That(groupState.Structure.Name, Is.EqualTo(expectedStructure));
         }
 
         [TestFixture]

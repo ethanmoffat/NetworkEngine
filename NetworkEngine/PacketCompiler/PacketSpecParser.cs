@@ -19,6 +19,9 @@ namespace NetworkEngine.PacketCompiler
         private const string LengthAttribute = "length";
         private const string ValueAttribute = "value";
         private const string PeekName = "peek";
+        private const string CountTypeName = "countType";
+        private const string BreakOnName = "breakOn";
+        private const string BreakTypeName = "breakType";
 
         private readonly XmlDocument _specXml;
         private readonly string _filePath;
@@ -29,11 +32,14 @@ namespace NetworkEngine.PacketCompiler
 
             _specXml = new XmlDocument();
             _specXml.Load(filePath);
+            RemoveComments(_specXml);
         }
 
         internal PacketSpecParser(XmlDocument specXml)
         {
             _specXml = specXml;
+            RemoveComments(_specXml);
+
             _filePath = string.Empty;
         }
 
@@ -57,6 +63,7 @@ namespace NetworkEngine.PacketCompiler
             {
                 var dataElement = XmlNodeToDataElement(node);
                 packetState = packetState.WithData(dataElement);
+
                 node = node.NextSibling;
             }
 
@@ -65,45 +72,63 @@ namespace NetworkEngine.PacketCompiler
 
         private static PacketDataElement XmlNodeToDataElement(XmlNode node)
         {
+            if (node == null)
+                return null;
+
             var parseResult = Enum.TryParse(node.Name, result: out PacketDataType dataType, ignoreCase: true);
             if (!parseResult)
             {
                 throw new ArgumentException($"Unable to parse packet data type of {node.Name}");
             }
 
-            var attribute = node.Attributes?[LengthAttribute];
+            if (node.Attributes == null)
+            {
+                throw new ArgumentException($"Attributes are required for XmlNode. XmlNode is of invalid type {node.NodeType}.", nameof(node));
+            }
+
+            var attribute = node.Attributes[LengthAttribute];
             var length = int.Parse(attribute?.Value ?? "0");
 
             var elementName = node.InnerText;
             switch (dataType)
             {
                 case PacketDataType.Structure:
-                    elementName = node.Attributes?[NameAttribute]?.Value;
+                    elementName = node.Attributes[NameAttribute]?.Value;
                     break;
                 case PacketDataType.Condition:
+                case PacketDataType.Group:
                     elementName = string.Empty;
                     break;
             }
 
             IMemberState memberState = null;
+            var childNodes = node.ChildNodes.GetEnumerator().ToEnumerable<XmlNode>();
             if (dataType == PacketDataType.Structure)
             {
-                memberState = ProcessStructure(node.ChildNodes);
+                memberState = ProcessStructure(childNodes.ToList());
             }
             else if (dataType == PacketDataType.Condition)
             {
-                memberState = ProcessCondition(node.Attributes[PeekName],
-                                               node.ChildNodes.GetEnumerator().ToEnumerable<XmlNode>());
+                var peek = node.Attributes[PeekName];
+                memberState = ProcessCondition(peek, childNodes.ToList());
+            }
+            else if(dataType == PacketDataType.Group)
+            {
+                var countType = node.Attributes[CountTypeName]?.Value;
+                var breakOn = node.Attributes[BreakOnName]?.Value;
+                var breakType = node.Attributes[BreakTypeName]?.Value;
+                var peek = node.Attributes[PeekName]?.Value;
+                memberState = ProcessGroup(countType, breakOn, breakType, peek, childNodes.ToList());
             }
 
             return new PacketDataElement(dataType, length, elementName, memberState);
         }
 
-        private static IMemberState ProcessStructure(XmlNodeList childNodes)
+        private static IMemberState ProcessStructure(IReadOnlyList<XmlNode> childNodes)
         {
             var retList = new List<PacketDataElement>();
 
-            foreach (XmlNode node in childNodes)
+            foreach (var node in childNodes)
             {
                 retList.Add(XmlNodeToDataElement(node));
             }
@@ -111,15 +136,14 @@ namespace NetworkEngine.PacketCompiler
             return new StructureState(retList);
         }
 
-        private static IMemberState ProcessCondition(XmlAttribute peekAttribute, IEnumerable<XmlNode> childNodes)
+        private static IMemberState ProcessCondition(XmlAttribute peekAttribute, List<XmlNode> childNodes)
         {
             var peekValue = bool.Parse(peekAttribute.Value);
 
-            var childNodesList = childNodes.ToList();
-            var testType = XmlNodeToDataElement(childNodesList[0]);
+            var testType = XmlNodeToDataElement(childNodes[0]);
 
             var casesList = new List<ConditionState.CaseState>();
-            var cases = childNodesList
+            var cases = childNodes
                 .Where(x => x.Name.Equals("Case", StringComparison.InvariantCultureIgnoreCase))
                 .ToList();
             foreach (var @case in cases)
@@ -132,6 +156,40 @@ namespace NetworkEngine.PacketCompiler
             }
 
             return new ConditionState(peekValue, testType, casesList);
+        }
+
+        private static IMemberState ProcessGroup(string countTypeStr,
+                                                 string breakOnStr,
+                                                 string breakTypeStr,
+                                                 string peekStr,
+                                                 IReadOnlyList<XmlNode> childNodes)
+        {
+            var countTypeIsSet = Enum.TryParse(countTypeStr, result: out PacketDataType countType, ignoreCase: true);
+            var breakOnIsSet = int.TryParse(breakOnStr, out var breakOn);
+            var breakTypeIsSet = Enum.TryParse(breakTypeStr, result: out PacketDataType breakType, ignoreCase: true);
+            var peekIsSet = bool.TryParse(peekStr, out var peek);
+
+            var preLoopNode = XmlNodeToDataElement(childNodes
+                .SingleOrDefault(x => x.Name.Equals("preLoop", StringComparison.CurrentCultureIgnoreCase))
+                ?.FirstChild);
+            var postLoopNode = XmlNodeToDataElement(childNodes
+                .SingleOrDefault(x => x.Name.Equals("postLoop", StringComparison.CurrentCultureIgnoreCase))
+                ?.FirstChild);
+            var structureNode = XmlNodeToDataElement(childNodes
+                .Single(x => x.Name.Equals("structure", StringComparison.CurrentCultureIgnoreCase)));
+
+            var groupState = new GroupState(preLoopNode, postLoopNode, structureNode);
+
+            if (countTypeIsSet)
+                groupState.CountType = countType;
+            if (breakOnIsSet)
+                groupState.BreakOn = breakOn;
+            if (breakTypeIsSet)
+                groupState.BreakType = breakType;
+            if (peekIsSet)
+                groupState.Peek = peek;
+
+            return groupState;
         }
 
         private static ValidationState ValidatePacketStructure(XmlDocument specXml, ParseOptions options)
@@ -200,6 +258,20 @@ namespace NetworkEngine.PacketCompiler
         {
             var packetElement = specXml.DocumentElement;
             return packetElement.Attributes[BaseAttribute]?.Value ?? string.Empty;
+        }
+
+        private static void RemoveComments(XmlDocument specXml)
+        {
+            var commentNodes = specXml.SelectNodes("/descendant-or-self::node()")
+                .OfType<XmlNode>()
+                .Where(x => x.NodeType == XmlNodeType.Comment)
+                .Select(x => (Parent: x.ParentNode, Node: x))
+                .ToList();
+
+            foreach (var node in commentNodes)
+            {
+                node.Parent.RemoveChild(node.Node);
+            }
         }
     }
 }

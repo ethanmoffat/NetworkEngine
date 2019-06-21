@@ -8,10 +8,10 @@
     - the delimiter is *not* peeked but is consumed from the packet stream
   -->
   <group countType="char" breakOn="255" breakType="byte" peek="false" >
-    <preloop>
+    <preLoop>
       <!-- One byte is skipped before starting looping -->
       <byte>SkippedByte</byte>
-    </preloop>
+    </preLoop>
     <structure name="AccountCharacter">
       <breakString>Name</breakString>
       <int>Id</int>
@@ -30,9 +30,9 @@
       <short>Shield</short>
       <short>Weapon</short>
     </structure>
-    <postloop>
+    <postLoop>
       <!-- Final byte is expected to be equal to 255 -->
       <byte>FinalDelimiter</byte>
-    </postloop>
+    </postLoop>
   </group>
 </packet>
