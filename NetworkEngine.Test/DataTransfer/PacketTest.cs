@@ -178,5 +178,15 @@ namespace NetworkEngine.Test.DataTransfer
             var remainingBytes = packet.ReadBytes(3);
             Assert.That(remainingBytes, Is.EquivalentTo(new[] { (byte)'A', (byte)'B', (byte)'C' }));
         }
+
+        [Test]
+        public void Packet_DecodesNumbersWithZeroByteProperly()
+        {
+            // expected: 3*MAX_THREE+127*MAX_TWO+2*MAX_1+1
+            const int ExpectedResult = 56712481;
+            var bytes = new byte[] { 2, 3, 0, 4 };
+            var packet = new Packet(bytes);
+            Assert.That(packet.ReadInt(), Is.EqualTo(ExpectedResult));
+        }
     }
 }

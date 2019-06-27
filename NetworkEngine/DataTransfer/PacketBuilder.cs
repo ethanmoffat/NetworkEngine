@@ -8,8 +8,6 @@ namespace NetworkEngine.DataTransfer
 {
     public class PacketBuilder : IPacketBuilder
     {
-        private const byte BREAK_STR_MAXVAL = 121;
-
         private readonly IReadOnlyList<byte> _data;
         private readonly INumberEncoder _numberEncoder;
 
@@ -64,9 +62,7 @@ namespace NetworkEngine.DataTransfer
 
         public IPacketBuilder AddBreakString(string s)
         {
-            var sBytes = Encoding.ASCII.GetBytes(s);
-            var sList = sBytes.Select(b => b == byte.MaxValue ? BREAK_STR_MAXVAL : b).ToList();
-            sList.Add(byte.MaxValue);
+            var sList = Encoding.ASCII.GetBytes(s).Concat(new[] { byte.MaxValue }).ToList();
             return AddBytes(sList);
         }
 
