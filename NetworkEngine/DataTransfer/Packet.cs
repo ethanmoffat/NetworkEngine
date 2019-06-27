@@ -1,6 +1,4 @@
 ﻿// Original Work Copyright (c) Ethan Moffat 2014-2019
-// This file is subject to the GPL v2 License
-// For additional details, see the LICENSE file
 
 using System;
 using System.Collections.Generic;
@@ -13,12 +11,6 @@ namespace NetworkEngine.DataTransfer
     public class Packet : IPacket
     {
         private readonly INumberEncoder _numberEncoder;
-
-        public int Length => RawData.Count;
-
-        public int ReadPosition { get; private set; }
-
-        public IReadOnlyList<byte> RawData { get; }
 
         public Packet(IList<byte> data)
             : this(data.ToArray()) { }
@@ -35,6 +27,12 @@ namespace NetworkEngine.DataTransfer
             RawData = new List<byte>(data);
             _numberEncoder = numberEncoder;
         }
+
+        public int Length => RawData.Count;
+
+        public int ReadPosition { get; private set; }
+
+        public IReadOnlyList<byte> RawData { get; }
 
         public void Seek(int position, SeekOrigin origin)
         {
@@ -128,12 +126,6 @@ namespace NetworkEngine.DataTransfer
             return bytes;
         }
 
-        private void ThrowIfOutOfBounds(int extraBytes)
-        {
-            if (ReadPosition + extraBytes > Length)
-                throw new InvalidOperationException("Operation is out of bounds of the packet");
-        }
-
         public byte ReadByte()
         {
             var ret = PeekByte();
@@ -184,7 +176,7 @@ namespace NetworkEngine.DataTransfer
         public string ReadBreakString()
         {
             var ret = PeekBreakString();
-            ReadPosition += ret.Length + 1;
+            ReadPosition = Math.Min(ReadPosition + ret.Length + 1, Length);
             return ret;
         }
 
@@ -193,6 +185,12 @@ namespace NetworkEngine.DataTransfer
             var ret = PeekBytes(length);
             ReadPosition += length;
             return ret;
+        }
+
+        private void ThrowIfOutOfBounds(int extraBytes)
+        {
+            if (ReadPosition + extraBytes > Length)
+                throw new InvalidOperationException("Operation is out of bounds of the packet");
         }
     }
 }
