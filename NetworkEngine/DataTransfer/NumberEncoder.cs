@@ -8,39 +8,37 @@ namespace NetworkEngine.DataTransfer
 {
     public class NumberEncoder : INumberEncoder
     {
-        private const int ONE_BYTE_MAX = 253;
-        private const int TWO_BYTE_MAX = 64009;
-        private const int THREE_BYTE_MAX = 16194277;
+        internal const int OneByteMax = 253;
+        internal const int TwoByteMax = 64009;
+        internal const int ThreeByteMax = 16194277;
 
         public byte[] EncodeNumber(int number, int size)
         {
             var unsigned = (uint) number;
-            var numArray = Enumerable.Repeat((uint)254, 4).ToArray();
+            var numArray = new byte[] {254, 254, 254, 254};
             var original = unsigned;
 
-            if (original >= THREE_BYTE_MAX)
+            if (original >= ThreeByteMax)
             {
-                numArray[3] = unsigned / THREE_BYTE_MAX + 1;
-                unsigned = unsigned % THREE_BYTE_MAX;
+                numArray[3] = (byte)(unsigned / ThreeByteMax + 1);
+                unsigned = unsigned % ThreeByteMax;
             }
 
-            if (original >= TWO_BYTE_MAX)
+            if (original >= TwoByteMax)
             {
-                numArray[2] = unsigned / TWO_BYTE_MAX + 1;
-                unsigned = unsigned % TWO_BYTE_MAX;
+                numArray[2] = (byte)(unsigned / TwoByteMax + 1);
+                unsigned = unsigned % TwoByteMax;
             }
 
-            if (original >= ONE_BYTE_MAX)
+            if (original >= OneByteMax)
             {
-                numArray[1] = unsigned / ONE_BYTE_MAX + 1;
-                unsigned = unsigned % ONE_BYTE_MAX;
+                numArray[1] = (byte)(unsigned / OneByteMax + 1);
+                unsigned = unsigned % OneByteMax;
             }
 
-            numArray[0] = unsigned + 1;
+            numArray[0] = (byte)(unsigned + 1);
 
-            return numArray.Select(x => (byte)x)
-                           .Take(size)
-                           .ToArray();
+            return numArray.Take(size).ToArray();
         }
 
         public int DecodeNumber(params byte[] b)
@@ -56,11 +54,11 @@ namespace NetworkEngine.DataTransfer
 
             var retNum = 0;
             if (b.Length > 3)
-                retNum += b[3]*THREE_BYTE_MAX;
+                retNum += b[3]*ThreeByteMax;
             if (b.Length > 2)
-                retNum += b[2]*TWO_BYTE_MAX;
+                retNum += b[2]*TwoByteMax;
             if (b.Length > 1)
-                retNum += b[1]*ONE_BYTE_MAX;
+                retNum += b[1]*OneByteMax;
 
             return retNum + b[0];
         }
