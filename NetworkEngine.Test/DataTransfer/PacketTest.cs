@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,7 @@ using NUnit.Framework;
 namespace NetworkEngine.Test.DataTransfer
 {
     [TestFixture]
+    [ExcludeFromCodeCoverage]
     public class PacketTest
     {
         [Test]

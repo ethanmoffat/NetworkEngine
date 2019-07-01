@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<packet name="basicgroup">
+  <group>
+    <structure name="SomeByte">
+      <byte>Hello</byte>
+    </structure>
+  </group>
+</packet>

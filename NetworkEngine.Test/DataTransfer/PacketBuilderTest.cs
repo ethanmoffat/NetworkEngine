@@ -1,9 +1,11 @@
 ﻿using NetworkEngine.DataTransfer;
 using NUnit.Framework;
+using System.Diagnostics.CodeAnalysis;
 
 namespace NetworkEngine.Test.DataTransfer
 {
     [TestFixture]
+    [ExcludeFromCodeCoverage]
     public class PacketBuilderTest
     {
         [Test]

@@ -1,9 +1,11 @@
 ﻿// Original Work Copyright (c) Ethan Moffat 2014-2019
 
+using System.Diagnostics.CodeAnalysis;
 using System.Xml.Schema;
 
 namespace NetworkEngine.PacketCompiler
 {
+    [ExcludeFromCodeCoverage]
     internal class ValidationState
     {
         public ValidationResult Status { get; }

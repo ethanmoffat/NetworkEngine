@@ -88,7 +88,7 @@ namespace NetworkEngine.PacketCompiler
             switch (dataType)
             {
                 case PacketDataType.Structure:
-                    elementName = node.Attributes[NameAttribute]?.Value;
+                    elementName = node.Attributes[NameAttribute].Value;
                     break;
                 case PacketDataType.Condition:
                 case PacketDataType.Group:
@@ -164,16 +164,21 @@ namespace NetworkEngine.PacketCompiler
             var breakTypeIsSet = Enum.TryParse(breakTypeStr, result: out PacketDataType breakType, ignoreCase: true);
             var peekIsSet = bool.TryParse(peekStr, out var peek);
 
-            var preLoopNode = XmlNodeToDataElement(childNodes
+            var preLoopNode = childNodes
                 .SingleOrDefault(x => x.Name.Equals("preLoop", StringComparison.CurrentCultureIgnoreCase))
-                ?.FirstChild);
-            var postLoopNode = XmlNodeToDataElement(childNodes
+                ?.FirstChild;
+            var preLoopDataElement = preLoopNode == null ? null : XmlNodeToDataElement(preLoopNode);
+
+
+            var postLoopNode = childNodes
                 .SingleOrDefault(x => x.Name.Equals("postLoop", StringComparison.CurrentCultureIgnoreCase))
-                ?.FirstChild);
-            var structureNode = XmlNodeToDataElement(childNodes
+                ?.FirstChild;
+            var postLoopDataElement = postLoopNode == null ? null : XmlNodeToDataElement(postLoopNode);
+
+            var structureDataElement = XmlNodeToDataElement(childNodes
                 .Single(x => x.Name.Equals("structure", StringComparison.CurrentCultureIgnoreCase)));
 
-            var groupState = new GroupState(preLoopNode, postLoopNode, structureNode);
+            var groupState = new GroupState(preLoopDataElement, postLoopDataElement, structureDataElement);
 
             if (countTypeIsSet)
                 groupState.CountType = countType;

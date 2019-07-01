@@ -156,9 +156,9 @@
   <xs:element name="group">
     <xs:complexType>
       <xs:sequence maxOccurs="1">
-        <xs:element ref="preLoop"/>
+        <xs:element ref="preLoop" minOccurs="0"/>
         <xs:element ref="structure" minOccurs="1"/>
-        <xs:element ref="postLoop"/>
+        <xs:element ref="postLoop" minOccurs="0"/>
       </xs:sequence>
       <xs:attributeGroup ref="groupAttributes" />
     </xs:complexType>

@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Xml;
 using NetworkEngine.PacketCompiler;
@@ -11,6 +12,7 @@ using NUnit.Framework;
 namespace NetworkEngine.Test.PacketCompiler
 {
     [TestFixture]
+    [ExcludeFromCodeCoverage]
     public class PacketSpecParserTest
     {
         [Test]
@@ -180,6 +182,23 @@ namespace NetworkEngine.Test.PacketCompiler
 
             var expectedStructure = doc.SelectSingleNode("/packet/group/structure/@name").Value;
             Assert.That(groupState.Structure.Name, Is.EqualTo(expectedStructure));
+        }
+
+        [Test]
+        public void GivenBasicGroup_NoOptions_GroupIsParsed()
+        {
+            var parser = new PacketSpecParser("PacketCompiler/Samples/basicgroup.xml");
+            var state = parser.Parse();
+
+            Assert.That(state.Data, Has.Count.EqualTo(1));
+            Assert.That(state.Data, Has.Exactly(1).With.Property(nameof(PacketDataElement.DataType)).EqualTo(PacketDataType.Group));
+
+            var groupState = (GroupState)state.Data[0].MemberState;
+
+            Assert.That(groupState.Structure.MemberState.Members,
+                Has.One.With.Property(nameof(PacketDataElement.Name)).EqualTo("Hello"));
+            Assert.That(groupState.Structure.MemberState.Members,
+                Has.One.With.Property(nameof(PacketDataElement.DataType)).EqualTo(PacketDataType.Byte));
         }
 
         [TestFixture]
