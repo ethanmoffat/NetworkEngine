@@ -4,7 +4,7 @@ NetworkEngine is a XML-based DSL for describing the format of packets in plainte
 
 ## Build Status
 
-[![Build status](https://ethanmoffat.visualstudio.com/EndlessClient/_apis/build/status/NetworkEngine%20CI)](https://ethanmoffat.visualstudio.com/EndlessClient/_build/latest?definitionId=8)
+[![Build status](https://ethanmoffat.visualstudio.com/EndlessClient/_apis/build/status/NetworkEngine%20CI)](https://ethanmoffat.visualstudio.com/EndlessClient/_build/latest?definitionId=8)  ![Azure DevOps tests](https://img.shields.io/azure-devops/tests/ethanmoffat/EndlessClient/8.svg?logo=azure-pipelines)  ![Azure DevOps coverage](https://img.shields.io/azure-devops/coverage/ethanmoffat/EndlessClient/8.svg?logo=azure-pipelines)
 
 ## Supported Data Types and Constructs
 
