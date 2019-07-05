@@ -3,7 +3,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Xml.Schema;
 
-namespace NetworkEngine.PacketCompiler
+namespace NetworkEngine.PacketCompiler.Parser
 {
     [ExcludeFromCodeCoverage]
     internal class ValidationState

@@ -2,7 +2,7 @@
 
 using System;
 
-namespace NetworkEngine.PacketCompiler
+namespace NetworkEngine.PacketCompiler.Parser
 {
     [Flags]
     public enum ParseOptions

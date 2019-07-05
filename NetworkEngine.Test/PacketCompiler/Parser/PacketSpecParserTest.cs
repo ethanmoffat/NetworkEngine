@@ -6,10 +6,11 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Xml;
 using NetworkEngine.PacketCompiler;
+using NetworkEngine.PacketCompiler.Parser;
 using NetworkEngine.PacketCompiler.State;
 using NUnit.Framework;
 
-namespace NetworkEngine.Test.PacketCompiler
+namespace NetworkEngine.Test.PacketCompiler.Parser
 {
     [TestFixture]
     [ExcludeFromCodeCoverage]

@@ -1,5 +1,7 @@
 ﻿// Original Work Copyright (c) Ethan Moffat 2014-2019
 
+using NetworkEngine.PacketCompiler.Parser;
+
 namespace NetworkEngine.PacketCompiler.State
 {
     public class PacketDataElement

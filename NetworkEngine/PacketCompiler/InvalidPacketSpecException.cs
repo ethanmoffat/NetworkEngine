@@ -2,6 +2,8 @@
 
 using System;
 
+using NetworkEngine.PacketCompiler.Parser;
+
 namespace NetworkEngine.PacketCompiler
 {
     public class InvalidPacketSpecException : Exception

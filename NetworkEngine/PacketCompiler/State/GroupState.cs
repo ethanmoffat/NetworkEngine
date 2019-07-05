@@ -2,6 +2,8 @@
 
 using System.Collections.Generic;
 
+using NetworkEngine.PacketCompiler.Parser;
+
 namespace NetworkEngine.PacketCompiler.State
 {
     public class GroupState : BaseMemberState

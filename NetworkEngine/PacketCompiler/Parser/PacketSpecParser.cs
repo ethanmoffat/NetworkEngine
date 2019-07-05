@@ -8,7 +8,7 @@ using System.Xml.Schema;
 using NetworkEngine.Extensions;
 using NetworkEngine.PacketCompiler.State;
 
-namespace NetworkEngine.PacketCompiler
+namespace NetworkEngine.PacketCompiler.Parser
 {
     public class PacketSpecParser
     {
