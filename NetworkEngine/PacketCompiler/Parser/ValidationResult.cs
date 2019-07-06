@@ -7,6 +7,8 @@ namespace NetworkEngine.PacketCompiler.Parser
         Ok,
         SchemaError,
         InvalidRootElement,
-        ElementRedefinition
+        ElementRedefinition,
+        NonexistentBasePacket,
+        CircularBasePacketDependency
     }
 }

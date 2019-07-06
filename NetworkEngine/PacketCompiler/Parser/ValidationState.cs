@@ -6,7 +6,7 @@ using System.Xml.Schema;
 namespace NetworkEngine.PacketCompiler.Parser
 {
     [ExcludeFromCodeCoverage]
-    internal class ValidationState
+    public class ValidationState
     {
         public ValidationResult Status { get; }
         public XmlSeverityType? ValidationSeverity { get; }
@@ -15,6 +15,9 @@ namespace NetworkEngine.PacketCompiler.Parser
 
         public ValidationState(ValidationResult status)
             : this(status, null, string.Empty, 0) { }
+
+        public ValidationState(ValidationResult status, string validationMessage)
+            : this(status, null, validationMessage, 0) { }
 
         public ValidationState(ValidationResult status, XmlSeverityType? validationSeverity, string validationMessage, int validationLineNumber)
         {

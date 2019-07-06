@@ -10,7 +10,7 @@ using NetworkEngine.PacketCompiler.State;
 
 namespace NetworkEngine.PacketCompiler.Parser
 {
-    public class PacketSpecParser
+    public class PacketSpecParser : IPacketSpecParser
     {
         private const string SchemaUri = "NetworkPacket.xsd";
         private const string PacketElement = "packet";
