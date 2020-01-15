@@ -79,7 +79,7 @@ namespace NetworkEngine.Test.DataTransfer
                 .AddThree(TestThree)
                 .Build();
             
-            var encoder = new NumberEncoder();
+            var encoder = new EndlessOnlineNumberEncoder();
             var expectedValue = encoder.DecodeNumber(encoder.EncodeNumber(TestThree, 3));
             Assert.That(packet.PeekThree(), Is.EqualTo(expectedValue));
         }

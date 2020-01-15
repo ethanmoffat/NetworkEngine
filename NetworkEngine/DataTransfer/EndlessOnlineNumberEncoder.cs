@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace NetworkEngine.DataTransfer
 {
-    public class NumberEncoder : INumberEncoder
+    public class EndlessOnlineNumberEncoder : INumberEncoder
     {
         internal const int OneByteMax = 253;
         internal const int TwoByteMax = 64009;

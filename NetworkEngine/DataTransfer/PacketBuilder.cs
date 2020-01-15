@@ -12,7 +12,7 @@ namespace NetworkEngine.DataTransfer
         private readonly INumberEncoder _numberEncoder;
 
         public PacketBuilder()
-            : this(new NumberEncoder()) { }
+            : this(new EndlessOnlineNumberEncoder()) { }
 
         public PacketBuilder(INumberEncoder numberEncoder)
             : this(new List<byte>(), numberEncoder) { }

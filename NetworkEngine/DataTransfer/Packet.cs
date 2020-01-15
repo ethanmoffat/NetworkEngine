@@ -19,7 +19,7 @@ namespace NetworkEngine.DataTransfer
             : this(data.ToArray(), numberEncoder) { }
 
         public Packet(byte[] data)
-            : this(data, new NumberEncoder()) { }
+            : this(data, new EndlessOnlineNumberEncoder()) { }
 
         public Packet(byte[] data, INumberEncoder numberEncoder)
         {
